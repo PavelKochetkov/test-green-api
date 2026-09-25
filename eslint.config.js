@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'node_modules', '.git']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -16,7 +16,27 @@ export default defineConfig([
       reactRefresh.configs.vite,
     ],
     languageOptions: {
+      ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      'semi': ['error', 'always'],
+      'indent': ['error', 2],
+      'space-in-parens': ['error', 'never'],
+      'curly': ['error', 'all'],
+      'quotes': ['error', 'single'],
+      'sort-imports': [
+        'error',
+        {
+          ignoreCase: true,
+          ignoreDeclarationSort: true,
+          ignoreMemberSort: false,
+          memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'],
+        },
+      ],
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/explicit-function-return-type': 'warn',
+      'no-console': 'warn'
+    }
   },
 ])
