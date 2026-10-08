@@ -1,78 +1,133 @@
-# React + TypeScript + Vite
+# Test Green API
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Веб-клиент мессенджера **Telegram**, работающий через сервис **[Green API](https://green-api.com)**. Приложение позволяет авторизоваться по данным инстанса Green API, создавать чаты по номеру телефона, отправлять и получать текстовые сообщения в реальном времени.
 
-Currently, two official plugins are available:
+## Возможности
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- 🔐 **Авторизация** - вход по `idInstance` и `apiTokenInstance`, проверка состояния инстанса (`getAccountSettings`), сохранение сессии в `localStorage`
+- 💬 **Создание чата** - добавление чата по номеру телефона с проверкой существования аккаунта в Telegram (`checkAccount`)
+- 📤 **Отправка сообщений** - отправка текстовых сообщений через метод `sendMessage`
+- 📥 **Приём сообщений** - получение входящих сообщений методом long polling (`receiveNotification`) с последующим удалением обработанных уведомлений (`deleteNotification`)
+- 🗂️ **История чатов и сообщений** - список чатов, переключение активного чата, отображение входящих/исходящих сообщений
+- 🛡️ **Защищённые маршруты** - страница чата доступна только авторизованным пользователям
+- 🌐 **Локализация** - интерфейс на русском языке (i18next)
+- 🎨 **Адаптивный интерфейс** - стилизация на Tailwind CSS
 
-## React Compiler
+## Технологический стек
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+| Технология | Назначение |
+|---|---|
+| React 19 | UI-библиотека |
+| TypeScript | Типизация |
+| Vite | Сборщик и dev-сервер |
+| Tailwind CSS 4 | Стилизация |
+| Zustand | Управление состоянием + персистентность в `localStorage` |
+| React Router | Маршрутизация |
+| React Hook Form + Zod | Формы и валидация |
+| i18next / react-i18next | Интернационализация |
+| Axios | HTTP-клиент |
+| Green API | Внешний API для работы с Telegram |
 
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
+## Требования
 
-## Expanding the ESLint configuration
+- Node.js 20+ и npm
+- Зарегистрированный аккаунт в [Green API](https://green-api.com) с созданным **Telegram-инстансом**
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Установка и запуск
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+```bash
+# Установка зависимостей
+npm install
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# Запуск в режиме разработки (браузер откроется автоматически)
+npm run dev
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Сборка production-версии
+npm run build
 
+# Локальный предпросмотр собранной версии
+npm run preview
+
+# Проверка кода линтером (ESLint)
+npm run lint
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+После запуска откройте приложение в браузере (по умолчанию Vite стартует на `http://localhost:5173`).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Как использовать
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. Зарегистрируйтесь в [личном кабинете Green API](https://console.green-api.com) и создайте инстанс типа **Telegram**.
+2. Привяжите к инстансу Telegram-аккаунт (авторизация по QR-коду через официальное приложение).
+3. Из настроек инстанса возьмите **`idInstance`** и **`apiTokenInstance`**.
+4. Откройте приложение и введите эти данные на странице входа. После успешной проверки инстанса вы попадёте в чат.
+5. Введите номер телефона собеседника в формате международного номера (например, `79991234567`), чтобы создать новый чат.
+6. Отправляйте сообщения, входящие сообщения подтягиваются автоматически через long polling.
+
+> ⚠️ Учётные данные не передаются на сторонние серверы: все запросы идут напрямую в Green API, а сессия (токены, список чатов, история сообщений) хранится локально в `localStorage` браузера.
+
+## Структура проекта
 
 ```
+├── index.html                  # HTML-шаблон
+├── vite.config.ts              # Конфигурация Vite (React Compiler, Tailwind)
+├── tsconfig.json               # Конфигурация TypeScript
+├── eslint.config.js            # Конфигурация ESLint
+└── src/
+    ├── main.tsx                # Точка входа
+    ├── init.tsx                # Инициализация i18next и рендер приложения
+    ├── App.tsx                 # Корневой компонент, маршрутизация
+    ├── index.css               # Глобальные стили (Tailwind)
+    ├── api/                    # Слой работы с Green API
+    │   ├── apiClient.ts        # Axios-клиент (baseURL)
+    │   ├── auth.ts             # getAccountSettings - проверка аккаунта
+    │   ├── check-account.ts    # checkAccount - проверка номера телефона
+    │   ├── sendMessage.ts      # sendMessage - отправка сообщения
+    │   ├── notification.ts     # receiveNotification - получение уведомлений
+    │   └── delete-notification.ts  # deleteNotification - удаление уведомления
+    ├── components/             # Компоненты UI
+    │   ├── Logo.tsx
+    │   ├── PrivateRoute.tsx    # Защита маршрута от неавторизованных
+    │   ├── chat/               # Компоненты чата (Sidebar, ChatWindow и др.)
+    │   └── forms/              # Формы (LoginForm, CreateChatForm, SendMessageForm)
+    ├── locales/                # Ресурсы i18n (русский язык)
+    ├── page/                   # Страницы (Login, Chat, NotFoundPage)
+    ├── store/                  # Zustand-сторы
+    │   ├── authStore.ts        # Авторизация, учётная запись, сессия
+    │   ├── chatStore.ts        # Чаты, сообщения, long polling уведомлений
+    │   └── notificationPolling.ts # long polling уведомлений
+    └── utils/
+        └── routes.ts           # Константы маршрутов
+```
+
+## Конфигурация Green API
+
+Базовый URL Green API задан в [`src/api/apiClient.ts`](src/api/apiClient.ts):
+
+```ts
+export const apiClient = axios.create({
+  baseURL: 'https://4100.api.green-api.com',
+  headers: { 'Content-Type': 'application/json' },
+});
+```
+
+При необходимости (например, для другого региона или собственного прокси) замените значение `baseURL`.
+
+## Используемые методы Green API
+
+| Метод | Назначение |
+|---|---|
+| `GET /waInstance{id}/getAccountSettings/{token}` | Проверка статуса инстанса при входе |
+| `POST /waInstance{id}/checkAccount/{token}` | Проверка существования номера в Telegram |
+| `POST /waInstance{id}/sendMessage/{token}` | Отправка текстового сообщения |
+| `GET /waInstance{id}/receiveNotification/{token}` | Получение входящего уведомления (long polling) |
+| `DELETE /waInstance{id}/deleteNotification/{token}/{receiptId}` | Подтверждение обработки уведомления |
+
+Подробнее: [документация Green API](https://green-api.com/docs/api/).
+
+## Роутинг
+
+| Путь | Страница | Доступ |
+|---|---|---|
+| `/login` | Вход в систему | Всегда |
+| `/` | Чат | Только для авторизованных (`PrivateRoute`) |
+| `*` | Страница 404 | Всегда |
