@@ -98,7 +98,8 @@ npm run lint
     │   ├── chatStore.ts        # Чаты, сообщения, long polling уведомлений
     │   └── notificationPolling.ts # long polling уведомлений
     └── utils/
-        └── routes.ts           # Константы маршрутов
+        ├── routes.ts           # Константы маршрутов
+        └── handleError.ts      # Обработка ошибок
 ```
 
 ## Конфигурация Green API
