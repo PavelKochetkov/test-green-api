@@ -18,10 +18,6 @@ export type GreenApiAccountData = z.infer<typeof GreenApiAccountSchema>;
 const fetchGreenApiAccountInfo = async (idInstance: string, apiTokenInstance: string): Promise<GreenApiAccountData> => {
   const responce = await apiClient.get(`/waInstance${idInstance}/getAccountSettings/${apiTokenInstance}`);
 
-  if (responce.status !== 200) {
-    throw new Error(`Green API error: ${responce.status}`);
-  }
-
   return GreenApiAccountSchema.parse(responce.data);
 };
 

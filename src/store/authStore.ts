@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import fetchGreenApiAccountInfo, { type GreenApiAccountData } from '../api/auth';
+import { AxiosError } from 'axios';
 
 interface IAuthState {
   account: GreenApiAccountData | null;
   loading: boolean;
-  error: string | null;
+  error: number | string | null;
   isAuth: boolean;
   idInstance: string;
   apiTokenInstance: string;
@@ -20,6 +21,7 @@ type IsAuthState = IAuthState['isAuth'];
 type IdInstanceState = IAuthState['idInstance'];
 type ApiTokenInstanceState = IAuthState['apiTokenInstance'];
 type ErrorState = IAuthState['error'];
+type StateInstance = GreenApiAccountData['stateInstance'] | undefined;
 
 const AUTH_STORAGE_KEY = 'auth-storage';
 
@@ -53,7 +55,7 @@ const useAuthStore = create<IAuthState>()(
         } catch (error) {
           set({
             loading: false,
-            error: error instanceof Error ? error.message : 'Не удалось проверить статус учётной записи Green API',
+            error: error instanceof AxiosError ? error.status : 'Не удалось проверить статус учётной записи Green API',
           });
         }
       },
@@ -87,3 +89,4 @@ export const useLogin = (): LoginAction => useAuthStore((state) => state.login);
 export const useLogout = (): LogoutAction => useAuthStore((state) => state.logout);
 export const useIdInstance = (): IdInstanceState => useAuthStore((state) => state.idInstance);
 export const useApiTokenInstance = (): ApiTokenInstanceState => useAuthStore((state) => state.apiTokenInstance);
+export const useStateInstance = (): StateInstance => useAuthStore((state) => state.account?.stateInstance);

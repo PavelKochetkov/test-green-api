@@ -1,10 +1,11 @@
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import useAuthStore, { useError, useLoading, useLogin } from '../../store/authStore';
+import useAuthStore, { useError, useLoading, useLogin, useStateInstance } from '../../store/authStore';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { getPageRoute } from '../../utils/routes';
+import handleError from '../../utils/handleError';
 
 const loginSchema = z.object({
   idInstance: z.string().min(1, { message: 'ID инстанса не может быть пустым' }),
@@ -23,6 +24,7 @@ const LoginForm = (): React.ReactElement => {
   const login = useLogin();
   const loading = useLoading();
   const error = useError();
+  const stateInstance = useStateInstance();
 
   const onSubmit = async (data: LoginFormData): Promise<void> => {
     const { idInstance, apiTokenInstance } = data; 
@@ -58,7 +60,8 @@ const LoginForm = (): React.ReactElement => {
       >
         {loading ? t('forms.loginForm.button.checking') : t('forms.loginForm.button.enter')}
       </button>
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-red-600">{handleError(error, t)}</p>}
+      {stateInstance === 'notAuthorized' && <p className="text-xs text-red-600">{t('errors.unauthorizedInstance')}</p>}
     </form>
   );
 };

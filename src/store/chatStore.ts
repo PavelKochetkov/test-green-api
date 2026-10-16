@@ -3,6 +3,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import useAuthStore from './authStore';
 import check, { type CheckAccountResponse } from '../api/check-account';
 import send from '../api/sendMessage';
+import { AxiosError } from 'axios';
 
 interface IChatItem {
   chatId: string;
@@ -24,7 +25,7 @@ interface IChatState {
   chatList: IChatItem[];
   messageList: IMessageList[];
   activeChatId: string | null;
-  error: string | null;
+  error: number | string | null;
   isCheckingAccount: boolean;
   checkAccount: (phoneNumber: number, idInstance?: string, apiTokenInstance?: string) => Promise<void>;
   createChat: (phoneNumber: number) => Promise<void>;
@@ -79,7 +80,7 @@ const useChatStore = create<IChatState>()(
           
         } catch (error) {
           set({
-            error: error instanceof Error ? error.message : 'Ошибка проверки аккаунта',
+            error: error instanceof AxiosError ? error.status : 'Ошибка проверки аккаунта',
             isCheckingAccount: false,
             account: null,
           });
@@ -123,7 +124,7 @@ const useChatStore = create<IChatState>()(
           });
         } catch (error) {
           set({
-            error: error instanceof Error ? error.message : 'Ошибка отправки сообщения',
+            error: error instanceof AxiosError ? error.status : 'Ошибка отправки сообщения',
           });
         }
       },

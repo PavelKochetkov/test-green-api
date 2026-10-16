@@ -24,6 +24,7 @@ const ChatHeader = (): React.ReactElement => {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
+          aria-label={t('chatPage.chatHeader.back')}
         >
           <path d="M19 12H5" />
           <path d="M12 19l-7-7 7-7" />
